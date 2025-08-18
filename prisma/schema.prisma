@@ -10,3 +10,49 @@ datasource db {
   provider = "sqlite"
   url      = env("DATABASE_URL")
 }
+
+// Usuário do sistema
+model User {
+  id        Int      @id @default(autoincrement())
+  name      String
+  email     String   @unique
+  cpfCnpj   String   @unique
+  password  String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  account Account?
+}
+
+// Conta bancária vinculada a um usuário
+model Account {
+  id        Int      @id @default(autoincrement())
+  userId    Int      @unique
+  balance   Float    @default(0.0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user                    User          @relation(fields: [userId], references: [id])
+  transactionsOrigin      Transaction[] @relation("transactionsOrigin")
+  transactionsDestination Transaction[] @relation("transactionsDestination")
+}
+
+// Transações (depósitos, saques, transferências)
+model Transaction {
+  id                   Int             @id @default(autoincrement())
+  originAccountID      Int? // conta de origem (null se for depósito inicial, por exemplo)
+  destinationAccountID Int? // conta de destino
+  amount               Float
+  type                 TransactionType
+  createdAt            DateTime        @default(now())
+
+  origin      Account? @relation("transactionsOrigin", fields: [originAccountID], references: [id])
+  destination Account? @relation("transactionsDestination", fields: [destinationAccountID], references: [id])
+}
+
+// Tipos de transação
+enum TransactionType {
+  DEPOSIT
+  WITHDRAW
+  TRANSFER
+}
