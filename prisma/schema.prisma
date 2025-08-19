@@ -13,7 +13,7 @@ datasource db {
 
 // Usuário do sistema
 model User {
-  id        Int      @id @default(autoincrement())
+  id        String   @id @default(uuid())
   name      String
   email     String   @unique
   cpfCnpj   String   @unique
@@ -26,8 +26,8 @@ model User {
 
 // Conta bancária vinculada a um usuário
 model Account {
-  id        Int      @id @default(autoincrement())
-  userId    Int      @unique
+  id        String   @id @default(uuid())
+  userId    String      @unique
   balance   Float    @default(0.0)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -39,9 +39,9 @@ model Account {
 
 // Transações (depósitos, saques, transferências)
 model Transaction {
-  id                   Int             @id @default(autoincrement())
-  originAccountID      Int? // conta de origem (null se for depósito inicial, por exemplo)
-  destinationAccountID Int? // conta de destino
+  id                   String          @id @default(uuid())
+  originAccountID      String? // conta de origem (null se for depósito inicial, por exemplo)
+  destinationAccountID String? // conta de destino
   amount               Float
   type                 TransactionType
   createdAt            DateTime        @default(now())

@@ -57,3 +57,5 @@ dev.db
 report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json
 
 /generated/prisma
+
+/generated/prisma
