@@ -52,8 +52,6 @@ describe('UserService', () => {
       expect(user).toHaveProperty('id');
       expect(user.name).toBe('Usuario Teste')
       expect(user).not.toHaveProperty('password')
-      expect(user).not.toHaveProperty('cpfCnpj')
-      expect(user).not.toHaveProperty('email')
     })
 
     it('should not be create a user with the same email', async () => {
@@ -165,8 +163,6 @@ describe('UserService', () => {
         expect(user).toHaveProperty('id')
         expect(user).toHaveProperty('name')
         expect(user).not.toHaveProperty('password')
-        expect(user).not.toHaveProperty('cpfCnpj')
-        expect(user).not.toHaveProperty('email')
       }
       )
     })
@@ -176,6 +172,66 @@ describe('UserService', () => {
 
       expect(Array.isArray(users)).toBe(true)
       expect(users.length).toBe(0)
+    })
+  })
+
+  describe('🔹findOne', () => {
+    it('should be return a user by id', async () => {
+      const user = await service.create({
+        name: 'Usuario Teste 3',
+        email: 'usuario3@teste.com 3',
+        cpfCnpj: '12345678903',
+        password: '098751425'
+      }) as User
+
+      const result = await service.findOne({ id: user.id }) as User
+      expect(result).toHaveProperty("id")
+      expect(result.id).toBe(user.id)
+    })
+
+    it('should be return a user by email', async () => {
+      const user = await service.create({
+        name: 'Usuario Teste 3',
+        email: 'usuario3@teste.com 3',
+        cpfCnpj: '12345678903',
+        password: '098751425'
+      }) as User
+
+      const result = await service.findOne({ email: user.email }) as User
+      expect(result).toHaveProperty("id")
+      expect(result.email).toBe(user.email)
+    })
+
+    it('should be return a user by cpf', async () => {
+      const user = await service.create({
+        name: 'Usuario Teste 3',
+        email: 'usuario3@teste.com 3',
+        cpfCnpj: '12345678903',
+        password: '098751425'
+      }) as User
+
+      const result = await service.findOne({ cpfCnpj: user.cpfCnpj }) as User
+      expect(result).toHaveProperty("id")
+      expect(result.cpfCnpj).toBe(user.cpfCnpj)
+    })
+
+    it('should be return a user by id, email or cpf but not return password value', async () => {
+      const user = await service.create({
+        name: 'Usuario Teste 3',
+        email: 'usuario3@teste.com 3',
+        cpfCnpj: '12345678903',
+        password: '098751425'
+      }) as User
+
+      const result_id = await service.findOne({ id: user.id }) as User
+      expect(result_id.id).toBe(user.id)
+      expect(result_id).not.toHaveProperty('password')
+      const result_email = await service.findOne({ email: user.email }) as User
+      expect(result_email.email).toBe(user.email)
+      expect(result_email).not.toHaveProperty('password')
+      const result_cpfCnpjf = await service.findOne({ cpfCnpj: user.cpfCnpj }) as User
+      expect(result_cpfCnpjf.cpfCnpj).toBe(user.cpfCnpj)
+      expect(result_cpfCnpjf).not.toHaveProperty('password')
     })
   })
 });

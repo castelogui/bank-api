@@ -9,7 +9,7 @@ export class UserController {
   constructor(private readonly userService: UserService) { }
 
   @Post()
-  async create(@Body() createUserDto: CreateUserDto): Promise<User | Error> {
+  async create(@Body() createUserDto: CreateUserDto): Promise<Omit<User, 'password'> | Error> {
     try {
       return this.userService.create(createUserDto);
     } catch (error) {
@@ -18,22 +18,22 @@ export class UserController {
   }
 
   @Get()
-  async findAll(): Promise<Array<User>> {
+  async findAll(): Promise<Array<Omit<User, 'password'>>> {
     return this.userService.findAll();
   }
 
   @Get(':id')
-  async findOne(@Param('id') id: string): Promise<User | null> {
-    return this.userService.findOne({ id: Number(id) });
+  async findOne(@Param('id') id: string): Promise<Omit<User, 'password'> | null> {
+    return this.userService.findOne({ id: id });
   }
 
   @Patch(':id')
   async update(@Param('id') id: string, @Body() data: UpdateUserDto) {
-    return this.userService.update({ data, where: { id: Number(id) } });
+    return this.userService.update({ data, where: { id: id } });
   }
 
   @Delete(':id')
   async remove(@Param('id') id: string) {
-    return this.userService.remove({ id: Number(id) });
+    return this.userService.remove({ id: id });
   }
 }
