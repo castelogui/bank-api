@@ -3,6 +3,7 @@ import { UserService } from './user.service';
 import { PrismaService } from '../../src/common/prisma/prisma.service';
 import { CommonModule } from '../../src/common/common.module';
 import { User } from '../../generated/prisma';
+import { isArray } from 'class-validator';
 
 describe('UserService', () => {
   let service: UserService;
@@ -102,6 +103,79 @@ describe('UserService', () => {
           password: '123456'
         })
       ).rejects.toThrow('DB error');
+    })
+  })
+
+  describe('🔹findAll', () => {
+    it('should be return a user list', async () => {
+      await service.create({
+        name: 'Usuario Teste 1',
+        email: 'usuario1@teste.com',
+        cpfCnpj: '12345678901',
+        password: '098751425'
+      })
+      await service.create({
+        name: 'Usuario Teste 2',
+        email: 'usuario2@teste.com',
+        cpfCnpj: '12345678902',
+        password: '098751425'
+      })
+      await service.create({
+        name: 'Usuario Teste 3',
+        email: 'usuario3@teste.com 3',
+        cpfCnpj: '12345678903',
+        password: '098751425'
+      })
+      const users = await service.findAll()
+
+      expect(Array.isArray(users)).toBe(true)
+      expect(users.length).toBeGreaterThanOrEqual(0)
+      users.forEach(user => {
+        expect(user).toHaveProperty('id')
+        expect(user).toHaveProperty('name')
+      }
+      )
+    })
+
+    it('should be return a user list but cannot return fields password, cpfCnpj, email', async () => {
+      await service.create({
+        name: 'Usuario Teste 1',
+        email: 'usuario1@teste.com',
+        cpfCnpj: '12345678901',
+        password: '098751425'
+      })
+      await service.create({
+        name: 'Usuario Teste 2',
+        email: 'usuario2@teste.com',
+        cpfCnpj: '12345678902',
+        password: '098751425'
+      })
+      await service.create({
+        name: 'Usuario Teste 3',
+        email: 'usuario3@teste.com 3',
+        cpfCnpj: '12345678903',
+        password: '098751425'
+      })
+      const users = await service.findAll()
+
+      expect(Array.isArray(users)).toBe(true)
+      expect(users.length).toBeGreaterThanOrEqual(0)
+
+      users.forEach(user => {
+        expect(user).toHaveProperty('id')
+        expect(user).toHaveProperty('name')
+        expect(user).not.toHaveProperty('password')
+        expect(user).not.toHaveProperty('cpfCnpj')
+        expect(user).not.toHaveProperty('email')
+      }
+      )
+    })
+
+    it('should return an empty array case if there are no users', async () => {
+      const users = await service.findAll()
+
+      expect(Array.isArray(users)).toBe(true)
+      expect(users.length).toBe(0)
     })
   })
 });

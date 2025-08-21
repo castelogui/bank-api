@@ -21,8 +21,15 @@ export class UserService {
     }
   }
 
-  async findAll(): Promise<Array<User>> {
-    return this.prisma.user.findMany();
+  async findAll(): Promise<Array<Omit<User, 'password' | 'email' | 'cpfCnpj'>>> {
+    return this.prisma.user.findMany({
+      select: {
+        id: true,
+        name: true,
+        createdAt: true,
+        updatedAt: true
+      }
+    });
   }
 
   async findOne(where: Prisma.UserWhereUniqueInput): Promise<User | null> {
