@@ -27,7 +27,7 @@ describe('UserService', () => {
     await prisma.$disconnect()
   })
 
-  describe('user-> create', () => {
+  describe('🔹create', () => {
     it('should be create a new user', async () => {
       const user = await service.create({
         name: 'Usuario Teste',
@@ -38,6 +38,21 @@ describe('UserService', () => {
 
       expect(user).toHaveProperty('id');
       expect(user.name).toBe('Usuario Teste')
+    })
+
+    it('a new user must be created but cannot return fields password, cpfCnpj, email', async () => {
+      const user = await service.create({
+        name: 'Usuario Teste',
+        email: 'usuario@teste.com',
+        cpfCnpj: '12345678900',
+        password: '098751425'
+      }) as User
+
+      expect(user).toHaveProperty('id');
+      expect(user.name).toBe('Usuario Teste')
+      expect(user).not.toHaveProperty('password')
+      expect(user).not.toHaveProperty('cpfCnpj')
+      expect(user).not.toHaveProperty('email')
     })
 
     it('should not be create a user with the same email', async () => {
@@ -76,5 +91,17 @@ describe('UserService', () => {
       ).rejects.toThrow(/Unique constraint failed/);
     });
 
+    it('should throw generic error if PrismaService fails (e.g.: DB disconnected)', async () => {
+      jest.spyOn(prisma.user, 'create').mockRejectedValue(new Error('DB error'));
+
+      await expect(
+        service.create({
+          name: 'Usuario Teste',
+          email: 'usuario@teste.com',
+          cpfCnpj: '12345678900',
+          password: '123456'
+        })
+      ).rejects.toThrow('DB error');
+    })
   })
 });
